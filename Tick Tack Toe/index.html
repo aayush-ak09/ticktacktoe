@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        .container {
+            margin-top: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .us1,
+        .us2 {
+            width: 19%;
+            height: 676px;
+            background-color: black;
+            display: flex;
+            margin-right: 20px;
+            margin-left: 20px;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .page {
+            height: 347px;
+            width: 336px;
+            padding: 288px;
+            background-color: white;
+            border: 1px solid black;
+            box-shadow: -4px 4px 8px black;
+            display: flex;
+            position: relative;
+            /* Added to position the strike-through line correctly */
+        }
+
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 10px;
+            width: max-content;
+            background-color: black;
+            transform: skew(-20deg);
+        }
+
+        .parallelogram {
+            width: 100px;
+            height: 100px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            cursor: pointer;
+        }
+
+        .strike-through {
+            position: absolute;
+            width: 0;
+            height: 10px;
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align:center; font-size:120px;">Last Page Games </h1>
+    <div class="container">
+        <div class="us1">
+            <h1>user1 details are here</h1>
+        </div>
+
+        <div class="page">
+            <div class="grid">
+                <div class="strike-through"></div>
+                <div class="parallelogram" data-index="0"></div>
+                <div class="parallelogram" data-index="1"></div>
+                <div class="parallelogram" data-index="2"></div>
+                <div class="parallelogram" data-index="3"></div>
+                <div class="parallelogram" data-index="4"></div>
+                <div class="parallelogram" data-index="5"></div>
+                <div class="parallelogram" data-index="6"></div>
+                <div class="parallelogram" data-index="7"></div>
+                <div class="parallelogram" data-index="8"></div>
+            </div>
+        </div>
+        <div class="us2">
+            <h1>user 2 details are here</h1>
+        </div>
+    </div>
+
+    <script>
+        const cells = document.querySelectorAll('.parallelogram');
+        const strikeThrough = document.querySelector('.strike-through');
+        let currentPlayer = 'X';
+        const board = Array(9).fill(null);
+
+        function handleClick(event) {
+            const cell = event.target;
+            const index = cell.dataset.index;
+
+            if (board[index] !== null || checkWinner()) {
+                return;
+            }
+
+            board[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.style.color = currentPlayer === 'X' ? 'red' : 'blue';
+
+            if (checkWinner()) {
+                // alert(`${currentPlayer} wins!`);
+            } else if (board.every(cell => cell !== null)) {
+                // alert("It's a draw!");
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+        }
+
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6],
+            ];
+
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    drawStrikeThrough(combination);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function drawStrikeThrough(combination) {
+            const firstCell = cells[combination[0]];
+            const lastCell = cells[combination[2]];
+
+            const startX = firstCell.offsetLeft;
+            const startY = firstCell.offsetTop + firstCell.offsetHeight / 2;
+            const endX = lastCell.offsetLeft + lastCell.offsetWidth;
+            const endY = lastCell.offsetTop + lastCell.offsetHeight / 2;
+
+            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+            const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
+
+            strikeThrough.style.width = `${length}px`;
+            strikeThrough.style.transform = `rotate(${angle}deg) scaleX(1)`;
+            strikeThrough.style.left = `${startX}px`;
+            strikeThrough.style.top = `${startY - 5}px`; // Adjust to center the line vertically
+            strikeThrough.style.backgroundColor = currentPlayer === 'X' ? 'red' : 'blue'; // Set the color based on the winner
+        }
+
+
+        cells.forEach(cell => cell.addEventListener('click', handleClick));
+
+    </script>
+</body>
+
+</html>
